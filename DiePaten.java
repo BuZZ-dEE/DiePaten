@@ -75,6 +75,15 @@ public class DiePaten extends FVSPlayer {
         sendReply(nextEdge, true);        
     }
     
+    public String maxFlow(int[][] adjacencyMatrix, String[][] capacityMatrix, int source, int sink) {
+    	String maxflow = null;
+    	String[][] restCapacity;
+    	
+    	
+    	
+    	return maxflow;
+    }
+    
     // Do not edit!
     public static void main(String args[]) throws IOException {
         NewStrategy p = new NewStrategy();
