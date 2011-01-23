@@ -1,6 +1,4 @@
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * Fill this class with your own strategy.
@@ -97,8 +95,6 @@ public class DiePaten extends FVSPlayer {
 			int source, int sink) {
 		String maxflow = null;
 		String[][] restCapacity;
-
-		aksdklafasd
 		
 		
 		return maxflow;
