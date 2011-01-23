@@ -5,6 +5,12 @@ import java.io.IOException;
  */
 public class DiePaten extends FVSPlayer {
 
+	public static final int WHITE = 0, GRAY = 1, BLACK = 2;
+	private int[] color, minCapacity, parent, queue;
+	private int first, last;
+	int[][] flow, restCapacity;
+
+	
 	public DiePaten() {
 		// Set your team name here
 		// Prior to sending the code in you should turn debugging off.
@@ -94,10 +100,47 @@ public class DiePaten extends FVSPlayer {
 	public String maxFlow(int[][] adjacencyMatrix, String[][] capacityMatrix,
 			int source, int sink) {
 		String maxflow = null;
-		String[][] restCapacity;
 		
+		flow = new int[capacityMatrix.length][capacityMatrix.length];
+		restCapacity = new int[capacityMatrix.length][capacityMatrix.length];
+		parent = new int[capacityMatrix.length];
 		
 		return maxflow;
+	}
+	
+	
+	private boolean BFS(int source) {
+		boolean augmentedPathExits = false;
+		
+		for (int i = 0; i < capacityMatrix.length; i++) {
+			color[i] = WHITE;
+			minCapacity[i] = Integer.MAX_VALUE;
+		}
+		
+		first = last = 0;
+		queue[last++] = source;
+		color[source] = GRAY;
+		
+		while (first != last) {
+			
+			int v = queue[first++];
+			for (int u = 0; u < capacityMatrix.length; u++) {
+				if (color[u] == WHITE && restCapacity[v][u] > 0) {
+					
+					minCapacity[u] = Math.min(minCapacity[v], restCapacity[v][u]);
+					parent[u] = v;
+					color[u] = GRAY;
+					
+					if (u == sink) {
+						augmentedPathExits = true;
+					} else {
+						queue[last++] = u;
+					}
+				}
+			}
+		}
+		
+		return augmentedPathExits;
 	}
 
 	// Do not edit!
