@@ -18,12 +18,8 @@ public class DiePaten extends FVSPlayer {
 	}
 
 	/*
-	 * Note: Available values are 
-	 * int source 
-	 * int sink 
-	 * int[][] adjacencyMatrix
-	 * string[][] capacityMatrix 
-	 * The capacities are encoded as Strings and can
+	 * Note: Available values are int source int sink int[][] adjacencyMatrix
+	 * string[][] capacityMatrix The capacities are encoded as Strings and can
 	 * be parsed by Integer.parseInt() The values in the adjacency matrix are
 	 * either UNSELECTED_EDGE, FLOW_EDGE, CUT_EDGE or NO_EDGE
 	 * 
@@ -42,11 +38,36 @@ public class DiePaten extends FVSPlayer {
 		 */
 		System.err.println("flow");
 		Edge nextEdge = null;
-		
-		nextEdge=maxcapacity();
+
+		nextEdge = bottleNecks();
+		// nextEdge=maxcapacity();
 
 		// Send final reply indicating that we won't change our mind any more.
 		sendReply(nextEdge, true);
+	}
+
+	// Engstellen im Graphen finden
+	// Kapazitaeten auf eins setzten und dann den Mincut finden
+	private Edge bottleNecks() {
+		Edge nextEdge = null;
+		int zero = 0;
+		int groesse = this.capacityMatrix.length;
+		int tempMatrix[][] = new int[groesse][groesse];
+
+		for (int l = 0; l < groesse; l++) {
+			for (int k = 0; k < groesse; k++) {
+				int temp = Integer.parseInt(capacityMatrix[l][k]);
+				if (temp > 0 && adjacencyMatrix[l][k] == UNSELECTED_EDGE) {
+					tempMatrix[l][k] = 1;
+				} else {
+					tempMatrix[l][k] = 0;
+				}
+			}
+		}
+		
+		//tempMatrix, getMincut
+
+		return nextEdge;
 	}
 
 	private Edge maxcapacity() {
@@ -105,6 +126,7 @@ public class DiePaten extends FVSPlayer {
 		restCapacity = new int[capacityMatrix.length][capacityMatrix.length];
 		parent = new int[capacityMatrix.length];
 		
+
 		return maxflow;
 	}
 	
@@ -149,5 +171,4 @@ public class DiePaten extends FVSPlayer {
 		p.connect();
 		p.mainLoop();
 	}
-
 }
