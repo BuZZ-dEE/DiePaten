@@ -7,7 +7,7 @@ public class DiePaten extends FVSPlayer {
 
 	public static final int WHITE = 0, GRAY = 1, BLACK = 2;
 	private int[] color, minCapacity, parent, queue;
-	private int first, last;
+	private int first, last, size;
 	int[][] flow, restCapacity;
 
 	
@@ -15,7 +15,8 @@ public class DiePaten extends FVSPlayer {
 		// Set your team name here
 		// Prior to sending the code in you should turn debugging off.
 		super("DiePaten", true);
-	
+
+		size = this.adjacencyMatrix.length;	
 	}
 
 	/*
@@ -86,7 +87,7 @@ public class DiePaten extends FVSPlayer {
 						nextEdge = new Edge(i, j);
 						sendReply(nextEdge, false);
 					}
-				}
+					}
 			}
 		}
 		return nextEdge;
@@ -120,13 +121,38 @@ public class DiePaten extends FVSPlayer {
 
 	}
 
-	public String maxFlow(int[][] adjacencyMatrix, String[][] capacityMatrix,
+
+	public int maxFlow(int[][] adjacencyMatrix, String[][] capacityMatrix,
 			int source, int sink) {
-		String maxflow = null;
+		int maxflow = 0;
 		
-		flow = new int[capacityMatrix.length][capacityMatrix.length];
-		restCapacity = new int[capacityMatrix.length][capacityMatrix.length];
-		parent = new int[capacityMatrix.length];
+		
+		flow = new int[size][size];
+		restCapacity = new int[size][size];
+		parent = new int[size];
+		minCapacity = new int[size];
+		color = new int[size];
+		queue = new int[size];
+		
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				restCapacity[i][j] = Integer.parseInt(capacityMatrix[i][j]);
+			}
+		}
+		
+		while(BFS(source)) {
+			maxflow += minCapacity[sink];
+			int v = sink, u;
+			
+			while(v != source) {
+				u = parent[v];
+				flow[u][v] += minCapacity[sink];
+				flow[v][u] -= minCapacity[sink];
+				restCapacity[u][v] -= minCapacity[sink];
+				restCapacity[v][u] += minCapacity[sink];
+				v = u;
+			}
+		}
 		
 
 		return maxflow;
@@ -136,7 +162,7 @@ public class DiePaten extends FVSPlayer {
 	private boolean BFS(int source) {
 		boolean augmentedPathExits = false;
 		
-		for (int i = 0; i < capacityMatrix.length; i++) {
+		for (int i = 0; i < size; i++) {
 			color[i] = WHITE;
 			minCapacity[i] = Integer.MAX_VALUE;
 		}
@@ -148,7 +174,7 @@ public class DiePaten extends FVSPlayer {
 		while (first != last) {
 			
 			int v = queue[first++];
-			for (int u = 0; u < capacityMatrix.length; u++) {
+			for (int u = 0; u < size; u++) {
 				if (color[u] == WHITE && restCapacity[v][u] > 0) {
 					
 					minCapacity[u] = Math.min(minCapacity[v], restCapacity[v][u]);
