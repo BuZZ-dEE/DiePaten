@@ -1,5 +1,5 @@
 import java.io.IOException;
-
+import java.lang.Object;
 /**
  * Fill this class with your own strategy.
  */
@@ -15,6 +15,7 @@ public class DiePaten extends FVSPlayer {
 		// Set your team name here
 		// Prior to sending the code in you should turn debugging off.
 		super("DiePaten", true);
+	
 	}
 
 	/*
@@ -45,6 +46,7 @@ public class DiePaten extends FVSPlayer {
 		// Send final reply indicating that we won't change our mind any more.
 		sendReply(nextEdge, true);
 	}
+
 
 	// Engstellen im Graphen finden
 	// Kapazitaeten auf eins setzten und dann den Mincut finden
@@ -167,7 +169,7 @@ public class DiePaten extends FVSPlayer {
 
 	// Do not edit!
 	public static void main(String args[]) throws IOException {
-		NewStrategy p = new NewStrategy();
+		DiePaten p = new DiePaten();
 		p.connect();
 		p.mainLoop();
 	}
