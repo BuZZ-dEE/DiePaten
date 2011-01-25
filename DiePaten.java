@@ -59,7 +59,7 @@ public class DiePaten extends FVSPlayer {
 						nextEdge = new Edge(i, j);
 						sendReply(nextEdge, false);
 					}
-				}
+					}
 			}
 		}
 		return nextEdge;
@@ -97,8 +97,6 @@ public class DiePaten extends FVSPlayer {
 			int source, int sink) {
 		String maxflow = null;
 		String[][] restCapacity;
-
-		//aksdklafasd
 		
 		
 		return maxflow;
