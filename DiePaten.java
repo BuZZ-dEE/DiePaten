@@ -1,25 +1,26 @@
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * Fill this class with your own strategy.
  */
 public class DiePaten extends FVSPlayer {
 
+	public static final int WHITE = 0, GRAY = 1, BLACK = 2;
+	private int[] color, minCapacity, parent, queue;
+	private int first, last, size;
+	int[][] flow, restCapacity;
+
+	
 	public DiePaten() {
 		// Set your team name here
 		// Prior to sending the code in you should turn debugging off.
 		super("DiePaten", true);
+		size = this.adjacencyMatrix.length;	
 	}
 
 	/*
-	 * Note: Available values are 
-	 * int source 
-	 * int sink 
-	 * int[][] adjacencyMatrix
-	 * string[][] capacityMatrix 
-	 * The capacities are encoded as Strings and can
+	 * Note: Available values are int source int sink int[][] adjacencyMatrix
+	 * string[][] capacityMatrix The capacities are encoded as Strings and can
 	 * be parsed by Integer.parseInt() The values in the adjacency matrix are
 	 * either UNSELECTED_EDGE, FLOW_EDGE, CUT_EDGE or NO_EDGE
 	 * 
@@ -38,11 +39,36 @@ public class DiePaten extends FVSPlayer {
 		 */
 		System.err.println("flow");
 		Edge nextEdge = null;
-		
-		nextEdge=maxcapacity();
+
+		nextEdge = bottleNecks();
+		// nextEdge=maxcapacity();
 
 		// Send final reply indicating that we won't change our mind any more.
 		sendReply(nextEdge, true);
+	}
+
+	// Engstellen im Graphen finden
+	// Kapazitaeten auf eins setzten und dann den Mincut finden
+	private Edge bottleNecks() {
+		Edge nextEdge = null;
+		int zero = 0;
+		int groesse = this.capacityMatrix.length;
+		int tempMatrix[][] = new int[groesse][groesse];
+
+		for (int l = 0; l < groesse; l++) {
+			for (int k = 0; k < groesse; k++) {
+				int temp = Integer.parseInt(capacityMatrix[l][k]);
+				if (temp > 0 && adjacencyMatrix[l][k] == UNSELECTED_EDGE) {
+					tempMatrix[l][k] = 1;
+				} else {
+					tempMatrix[l][k] = 0;
+				}
+			}
+		}
+		
+		//tempMatrix, getMincut
+
+		return nextEdge;
 	}
 
 	private Edge maxcapacity() {
@@ -93,13 +119,76 @@ public class DiePaten extends FVSPlayer {
 
 	}
 
-	public String maxFlow(int[][] adjacencyMatrix, String[][] capacityMatrix,
+
+	public int maxFlow(int[][] adjacencyMatrix, String[][] capacityMatrix,
 			int source, int sink) {
-		String maxflow = null;
-		String[][] restCapacity;
+		int maxflow = 0;
 		
 		
+		flow = new int[size][size];
+		restCapacity = new int[size][size];
+		parent = new int[size];
+		minCapacity = new int[size];
+		color = new int[size];
+		queue = new int[size];
+		
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				restCapacity[i][j] = Integer.parseInt(capacityMatrix[i][j]);
+			}
+		}
+		
+		while(BFS(source)) {
+			maxflow += minCapacity[sink];
+			int v = sink, u;
+			
+			while(v != source) {
+				u = parent[v];
+				flow[u][v] += minCapacity[sink];
+				flow[v][u] -= minCapacity[sink];
+				restCapacity[u][v] -= minCapacity[sink];
+				restCapacity[v][u] += minCapacity[sink];
+				v = u;
+			}
+		}
+		
+
 		return maxflow;
+	}
+	
+	
+	private boolean BFS(int source) {
+		boolean augmentedPathExits = false;
+		
+		for (int i = 0; i < size; i++) {
+			color[i] = WHITE;
+			minCapacity[i] = Integer.MAX_VALUE;
+		}
+		
+		first = last = 0;
+		queue[last++] = source;
+		color[source] = GRAY;
+		
+		while (first != last) {
+			
+			int v = queue[first++];
+			for (int u = 0; u < size; u++) {
+				if (color[u] == WHITE && restCapacity[v][u] > 0) {
+					
+					minCapacity[u] = Math.min(minCapacity[v], restCapacity[v][u]);
+					parent[u] = v;
+					color[u] = GRAY;
+					
+					if (u == sink) {
+						augmentedPathExits = true;
+					} else {
+						queue[last++] = u;
+					}
+				}
+			}
+		}
+		
+		return augmentedPathExits;
 	}
 
 	// Do not edit!
@@ -108,5 +197,4 @@ public class DiePaten extends FVSPlayer {
 		p.connect();
 		p.mainLoop();
 	}
-
 }
