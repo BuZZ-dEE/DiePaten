@@ -1,5 +1,5 @@
 import java.io.IOException;
-
+import java.util.ArrayList;
 /**
  * Fill this class with your own strategy.
  */
@@ -15,6 +15,7 @@ public class DiePaten extends FVSPlayer {
 		// Set your team name here
 		// Prior to sending the code in you should turn debugging off.
 		super("DiePaten", true);
+
 		size = this.adjacencyMatrix.length;	
 	}
 
@@ -46,6 +47,7 @@ public class DiePaten extends FVSPlayer {
 		// Send final reply indicating that we won't change our mind any more.
 		sendReply(nextEdge, true);
 	}
+
 
 	// Engstellen im Graphen finden
 	// Kapazitaeten auf eins setzten und dann den Mincut finden
@@ -117,6 +119,34 @@ public class DiePaten extends FVSPlayer {
 		}
 		return nextEdge;
 
+	}
+	
+	/**
+	 * Method to determine the nodes which are in the min-cut-source-set.
+	 * @return source_Set
+	 */
+	public ArrayList<Integer> sourceSet() {
+		ArrayList<Integer> source_Set = new ArrayList<Integer>();
+		
+		// restCapacity array to string-array
+		String[][] restCapacityString = new String[restCapacity.length][restCapacity.length];
+		for(int i = 0; i < restCapacity.length; i++) {
+			//restCapacityString[i] = new String[ restCapacity[i].length ];
+		    for(int j = 0; j < restCapacity[i].length; j++) {
+		    	restCapacityString[i][j] = Integer.toString( restCapacity[i][j] );
+		    }
+		}
+
+		// to compute the max-flow
+		maxFlow(adjacencyMatrix, capacityMatrix, source, sink);
+		// to get the source_Set of the global queue-array
+		maxFlow(adjacencyMatrix, restCapacityString, source, sink);
+		// put it in source_Set arraylist
+		for (int i = 0; i < queue.length; i++) {
+			source_Set.add(queue[i]);
+		}
+		
+		return source_Set;
 	}
 
 
@@ -209,7 +239,7 @@ public class DiePaten extends FVSPlayer {
 
 	// Do not edit!
 	public static void main(String args[]) throws IOException {
-		NewStrategy p = new NewStrategy();
+		DiePaten p = new DiePaten();
 		p.connect();
 		p.mainLoop();
 	}
