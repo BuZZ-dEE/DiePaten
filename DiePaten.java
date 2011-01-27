@@ -148,6 +148,31 @@ public class DiePaten extends FVSPlayer {
 		
 		return source_Set;
 	}
+	
+	public ArrayList<Integer> sinkSet() {
+		ArrayList<Integer> source_Set = new ArrayList<Integer>();
+		ArrayList<Integer> sink_Set = new ArrayList<Integer>();
+		source_Set = sourceSet();
+		
+		for (int i = 0; i < size; i++) {
+			sink_Set.add(i);
+			for (int j = 0; j < source_Set.size(); j++) {
+				if (source_Set.indexOf(j) == sink_Set.indexOf(i)) {
+					sink_Set.remove(i);
+				}
+			}
+		}
+		
+		return sink_Set;
+	}
+	
+	public ArrayList<Edge> minCut() {
+		ArrayList<Edge> min_Cut = new ArrayList<Edge>();
+		
+		
+		
+		return min_Cut;
+	}
 
 
 	public int maxFlow(int[][] adjacencyMatrix, String[][] capacityMatrix,
