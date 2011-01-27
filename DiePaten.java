@@ -181,8 +181,7 @@ public class DiePaten extends FVSPlayer {
 		
 		for (int q = 0; q < source_Set.size(); q++) {
 			for (int s = 0; s < sink_Set.size(); s++) {
-				// is that correct ???
-				if (adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 1 || adjacencyMatrix[sink_Set.get(s)][source_Set.get(q)] == 1) {
+				if (adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 1) {
 					edge = new Edge(source_Set.get(q), sink_Set.get(s));
 					min_Cut.add(edge);
 				}
