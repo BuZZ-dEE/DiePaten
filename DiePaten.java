@@ -41,7 +41,7 @@ public class DiePaten extends FVSPlayer {
 		System.err.println("flow");
 		Edge nextEdge = null;
 
-		nextEdge = bottleNecks();
+		//nextEdge = bottleNecks();
 		// nextEdge=maxcapacity();
 
 		// Send final reply indicating that we won't change our mind any more.
@@ -49,16 +49,17 @@ public class DiePaten extends FVSPlayer {
 	}
 
 
-	// Engstellen im Graphen finden
-	// Kapazitaeten auf eins setzten und dann den Mincut finden
-	private Edge bottleNecks() {
-		Edge nextEdge = null;
-		int zero = 0;
-		int groesse = this.capacityMatrix.length;
-		int tempMatrix[][] = new int[groesse][groesse];
+	/**
+	 * method to find the bottlenecks in the graph. every edge is set to 1 before
+	 * @return nextEges, the list with the bottlenecks-edges
+	 */
+	private ArrayList<Edge> bottleNecks() {
+		ArrayList<Edge> nextEdges = null;
 
-		for (int l = 0; l < groesse; l++) {
-			for (int k = 0; k < groesse; k++) {
+		int tempMatrix[][] = new int[size][size];
+
+		for (int l = 0; l < size; l++) {
+			for (int k = 0; k < size; k++) {
 				int temp = Integer.parseInt(capacityMatrix[l][k]);
 				if (temp > 0 && adjacencyMatrix[l][k] == UNSELECTED_EDGE) {
 					tempMatrix[l][k] = 1;
@@ -66,11 +67,12 @@ public class DiePaten extends FVSPlayer {
 					tempMatrix[l][k] = 0;
 				}
 			}
-		}
+		} 
 		
 		//tempMatrix, getMincut
+		nextEdges = minCut();
 
-		return nextEdge;
+		return nextEdges;
 	}
 
 	private Edge maxcapacity() {
@@ -165,6 +167,7 @@ public class DiePaten extends FVSPlayer {
 		
 		return sink_Set;
 	}
+	
 	
 	/**
 	 * determine the edges from source_set to sink_set
