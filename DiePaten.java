@@ -181,7 +181,7 @@ public class DiePaten extends FVSPlayer {
 		
 		for (int q = 0; q < source_Set.size(); q++) {
 			for (int s = 0; s < sink_Set.size(); s++) {
-				if (adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 1) {
+				if (adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 1 || adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 2) {
 					edge = new Edge(source_Set.get(q), sink_Set.get(s));
 					min_Cut.add(edge);
 				}
@@ -196,6 +196,13 @@ public class DiePaten extends FVSPlayer {
 			int source, int sink) {
 		int maxflow = 0;
 		
+		for (int x = 0; x < size; x++) {
+			for (int y = 0; y < size; y++) {
+				if (adjacencyMatrix[x][y] == CUT_EDGE) {
+					capacityMatrix[x][y] = "0";
+				}
+			}
+		}
 		
 		flow = new int[size][size];
 		restCapacity = new int[size][size];
