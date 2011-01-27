@@ -70,7 +70,7 @@ public class DiePaten extends FVSPlayer {
 		} 
 		
 		//tempMatrix, getMincut
-		nextEdges = minCut();
+		nextEdges = minCut(tempMatrix);
 
 		return nextEdges;
 	}
@@ -127,20 +127,22 @@ public class DiePaten extends FVSPlayer {
 	 * Method to determine the nodes which are in the min-cut-source-set.
 	 * @return source_Set
 	 */
-	public ArrayList<Integer> sourceSet() {
+	public ArrayList<Integer> sourceSet(int[][] capacityMatrix) {
 		ArrayList<Integer> source_Set = new ArrayList<Integer>();
 		
 		// restCapacity array to string-array
 		String[][] restCapacityString = new String[restCapacity.length][restCapacity.length];
+		String[][] capacityMatrixString = new String[restCapacity.length][restCapacity.length];
 		for(int i = 0; i < restCapacity.length; i++) {
 			//restCapacityString[i] = new String[ restCapacity[i].length ];
 		    for(int j = 0; j < restCapacity[i].length; j++) {
 		    	restCapacityString[i][j] = Integer.toString( restCapacity[i][j] );
+		    	capacityMatrixString[i][j] = Integer.toString( capacityMatrix[i][j] );
 		    }
 		}
 
 		// to compute the max-flow
-		maxFlow(adjacencyMatrix, capacityMatrix, source, sink);
+		maxFlow(adjacencyMatrix, capacityMatrixString, source, sink);
 		// to get the source_Set of the global queue-array
 		maxFlow(adjacencyMatrix, restCapacityString, source, sink);
 		// put it in source_Set arraylist
@@ -151,10 +153,10 @@ public class DiePaten extends FVSPlayer {
 		return source_Set;
 	}
 	
-	public ArrayList<Integer> sinkSet() {
+	public ArrayList<Integer> sinkSet(int[][] capacityMatrix) {
 		ArrayList<Integer> source_Set = new ArrayList<Integer>();
 		ArrayList<Integer> sink_Set = new ArrayList<Integer>();
-		source_Set = sourceSet();
+		source_Set = sourceSet(capacityMatrix);
 		
 		for (int i = 0; i < size; i++) {
 			sink_Set.add(i);
@@ -173,14 +175,14 @@ public class DiePaten extends FVSPlayer {
 	 * determine the edges from source_set to sink_set
 	 * @return the min-cut
 	 */
-	public ArrayList<Edge> minCut() {
+	public ArrayList<Edge> minCut(int[][] capacityMatrix) {
 		ArrayList<Edge> min_Cut = new ArrayList<Edge>();
 		ArrayList<Integer> source_Set = new ArrayList<Integer>();
 		ArrayList<Integer> sink_Set = new ArrayList<Integer>();
 		Edge edge;
 		
-		source_Set = sourceSet();
-		sink_Set = sinkSet();
+		source_Set = sourceSet(capacityMatrix);
+		sink_Set = sinkSet(capacityMatrix);
 		
 		for (int q = 0; q < source_Set.size(); q++) {
 			for (int s = 0; s < sink_Set.size(); s++) {
