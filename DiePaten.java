@@ -75,6 +75,10 @@ public class DiePaten extends FVSPlayer {
 		return nextEdges;
 	}
 
+	/**
+	 * method to choose the next edge with maximum capacity
+	 * @return nextEdge, the next chosen edge
+	 */
 	private Edge maxcapacity() {
 		int maxCapacity = 0;
 		int numNodes = this.capacityMatrix.length;
@@ -110,6 +114,10 @@ public class DiePaten extends FVSPlayer {
 		sendReply(nextEdge, true);
 	}
 
+	/**
+	 * method to choose the next edge radomly
+	 * @return nextEdge, the next chosen edge
+	 */
 	private Edge random() {
 		Edge nextEdge = null;
 		int numNodes = this.capacityMatrix.length;
