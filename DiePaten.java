@@ -166,11 +166,29 @@ public class DiePaten extends FVSPlayer {
 		return sink_Set;
 	}
 	
+	/**
+	 * determine the edges from source_set to sink_set
+	 * @return the min-cut
+	 */
 	public ArrayList<Edge> minCut() {
 		ArrayList<Edge> min_Cut = new ArrayList<Edge>();
+		ArrayList<Integer> source_Set = new ArrayList<Integer>();
+		ArrayList<Integer> sink_Set = new ArrayList<Integer>();
+		Edge edge;
 		
+		source_Set = sourceSet();
+		sink_Set = sinkSet();
 		
-		
+		for (int q = 0; q < source_Set.size(); q++) {
+			for (int s = 0; s < sink_Set.size(); s++) {
+				// is that correct ???
+				if (adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 1 || adjacencyMatrix[sink_Set.get(s)][source_Set.get(q)] == 1) {
+					edge = new Edge(source_Set.get(q), sink_Set.get(s));
+					min_Cut.add(edge);
+				}
+			}
+		}
+		 
 		return min_Cut;
 	}
 
