@@ -43,7 +43,7 @@ public class DiePaten extends FVSPlayer {
 
 		//nextEdge = bottleNecks();
 		// nextEdge=maxcapacity();
-
+		System.out.println(maxFlow(adjacencyMatrix, capacityMatrix, source, sink));
 		// Send final reply indicating that we won't change our mind any more.
 		sendReply(nextEdge, true);
 	}
@@ -106,7 +106,7 @@ public class DiePaten extends FVSPlayer {
 		 * Start of sample strategy. Replace this with your own code.
 		 */
 		System.err.println("cut");
-
+		System.out.println(maxFlow(adjacencyMatrix, capacityMatrix, source, sink));
 		// even poorer strategy: select a random edge
 		Edge nextEdge = null;
 		nextEdge = random();
