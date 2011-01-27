@@ -156,7 +156,7 @@ public class DiePaten extends FVSPlayer {
 		return maxflow;
 	}
 	
-	
+	//Breitensuche
 	private boolean BFS(int source) {
 		boolean augmentedPathExits = false;
 		
@@ -189,6 +189,22 @@ public class DiePaten extends FVSPlayer {
 		}
 		
 		return augmentedPathExits;
+	}
+	
+	//Tiefensuche
+	private boolean TFS(int source){
+		boolean v = false;
+		
+		for (int i = 0; i < size; i++){
+			color[i] = WHITE;
+			minCapacity[i] = Integer.MAX_VALUE;
+		}
+		
+		first = last = 0;
+		queue[last++] = source;
+		color[source] = GRAY;
+		
+		return v;
 	}
 
 	// Do not edit!
