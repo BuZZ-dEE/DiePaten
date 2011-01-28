@@ -1,12 +1,11 @@
 import java.io.IOException;
-<<<<<<< HEAD:DiePaten.java
 import java.lang.Object;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-=======
+
 import java.util.ArrayList;
->>>>>>> a7cac5bb2103ce03e5aa232b8dcc091406521da7:DiePaten.java
+
 /**
  * Fill this class with your own strategy.
  */
@@ -391,7 +390,7 @@ public class DiePaten extends FVSPlayer {
 		return maxflow;
 	}
 	
-<<<<<<< HEAD:DiePaten.java
+
 	private void dfs() {
 		for (int i = 0; i < adjacencyMatrix.length; i++) {
 			dfscolor = new int[size];
@@ -419,14 +418,14 @@ public class DiePaten extends FVSPlayer {
 		}
 	}
 	
-=======
+
 	/**
 	 * breadth-first search method
 	 * @param source, the source-node
 	 * @return true, if augmentedPathExits exists
 	 */
 
->>>>>>> a7cac5bb2103ce03e5aa232b8dcc091406521da7:DiePaten.java
+
 	private boolean BFS(int source) {
 		boolean augmentedPathExits = false;
 		
