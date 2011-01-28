@@ -6,6 +6,24 @@ import java.util.Stack;
 
 /**
  * Fill this class with your own strategy.
+ * Unsere Strategie:
+ * 
+ * 1. Wege komplettieren // Wir suchen im Graphen nach Wegen,
+ * denen nur noch eine Kante zum Komplettieren fehlt
+ * 
+ * Diese Strategie benutzen beide Parteien, da die Paten diese Wege
+ * schließen möchten und die Polizei das verhindern möchte
+ * 
+ * 2. Engstellen im Graphen ausfindig machen
+ * 
+ * Wir setzen alle Kanten im Graphen auf den Wert 1 und finden mittels MINCUT
+ * die Engstellen im Graphen. Diese müssen gesichert bzw. zerstört werden, um
+ * den Goldfluss zu minimieren bzw. maximieren. Wurde eine Engstelle gefunden,
+ * wird die Kante mit der höchsten Kapazität gewählt.
+ * 
+ * 3. Auswahl einer Kante:
+ * 
+ * 
  */
 public class DiePaten extends FVSPlayer {
 
@@ -23,7 +41,7 @@ public class DiePaten extends FVSPlayer {
 		// Prior to sending the code in you should turn debugging off.
 		super("DiePaten", true);
 
-		size = this.adjacencyMatrix.length;	
+		//
 	}
 
 	/*
@@ -41,19 +59,45 @@ public class DiePaten extends FVSPlayer {
 
 	// Implement your flow strategy
 	protected void handle_flow() {
-
+		size = this.adjacencyMatrix.length;	
 		/*
 		 * Start of sample strategy. Replace this with your own code.
 		 */
 		System.err.println("flow");
-		Edge nextEdge = null;
-
-		nextEdge = bottleNecks().get(0);
+		
+		
+		Edge nextEdge = random();
+		
+		if(adjacencyMatrix[0][3] != 2)
+			nextEdge = new Edge(0,3);
+		
+		else if(adjacencyMatrix[6][7] != 2)
+			nextEdge = new Edge(6,7);
+		
+		else{
+			nextEdge = Dfs();
+		}
+		//nextEdge = bottleNecks().get(0);
 		sendReply(nextEdge, true);
 		
 		// nextEdge=maxcapacity();
-		nextEdge = minCut(stringMatrixToInt(capacityMatrix)).get(0);
+		//nextEdge = minCut(stringMatrixToInt(capacityMatrix)).get(0);
 		// Send final reply indicating that we won't change our mind any more.
+		//sendReply(nextEdge, true);
+	}
+	
+	// Implement your cut strategy
+	protected void handle_cut() {
+		/*
+		 * Start of sample strategy. Replace this with your own code.
+		 */
+		size = this.adjacencyMatrix.length;	
+		System.err.println("cut");
+		System.err.println(maxFlow(adjacencyMatrix, capacityMatrix, source, sink));
+		// even poorer strategy: select a random edge
+		Edge nextEdge = null;
+		nextEdge = random();
+
 		sendReply(nextEdge, true);
 	}
 
@@ -199,19 +243,7 @@ public class DiePaten extends FVSPlayer {
 
 	}
 
-	// Implement your cut strategy
-	protected void handle_cut() {
-		/*
-		 * Start of sample strategy. Replace this with your own code.
-		 */
-		System.err.println("cut");
-		System.err.println(maxFlow(adjacencyMatrix, capacityMatrix, source, sink));
-		// even poorer strategy: select a random edge
-		Edge nextEdge = null;
-		nextEdge = random();
 
-		sendReply(nextEdge, true);
-	}
 
 	/**
 	 * method to choose the next edge radomly
@@ -429,11 +461,15 @@ public class DiePaten extends FVSPlayer {
 		return augmentedPathExits;
 	}
 	
-	// Modifizierte Tiefensuche, die jeden Weg im Graphen berechnet
-	// Für diese Suche werden 2 Stacks benutzt. Auf dem ersten Stack werden
-	// die aktuellen Knoten des Weges gespeichert und auf dem anderen Stack
-	// werden
-	// die aktuellen Positionen gespeichert um weitere Nachbarknoten zu finden
+
+	/**
+	 * Modifizierte Tiefensuche, die jeden Weg im Graphen berechnet
+	 * Für diese Suche werden 2 Stacks benutzt. Auf dem ersten Stack werden
+	 * die aktuellen Knoten des Weges gespeichert und auf dem anderen Stack
+	 * werden die aktuellen Positionen gespeichert um weitere Nachbarknoten zu finden
+	 * @return result Edge
+	 */
+
 	public Edge Dfs() {
 		stack.push(source);
 		nextstack.push(0);
@@ -448,7 +484,7 @@ public class DiePaten extends FVSPlayer {
 			// und suchen nun in checkGaps() nach einer Lücke in einem Weg
 			if (stack.empty()) {
 				finished = true;
-				checkGaps();
+				result = checkGaps();
 				break;
 			}
 
@@ -505,8 +541,12 @@ public class DiePaten extends FVSPlayer {
 		return result;
 	}
 
-	// checkGaps() prüft, ob es Wege gibt, bei denen nur noch eine Kante
-	// zum komplettieren fehlt
+
+	/**
+	 * checkGaps() prüft, ob es Wege gibt, bei denen nur noch eine Kante
+	 * zum komplettieren fehlt
+	 * @return result Edge
+	 */
 	public Edge checkGaps() {
 		Edge result = null;
 		// Geht alle Stacks in der Stackliste durch
