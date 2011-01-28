@@ -65,30 +65,32 @@ public class DiePaten extends FVSPlayer {
 		System.err.println("flow");
 
 		// Random, um eine Antwort zu Sichern
-		Edge nextEdge = random();
-		//sendReply(nextEdge, true);
-		System.err.println("random " + nextEdge.from + " " + nextEdge.to);
-		
+		Edge nextEdge = null;
+		// sendReply(nextEdge, true);
+		//System.err.println("random " + nextEdge.from + " " + nextEdge.to);
+
 		// Wege kompletieren
-		nextEdge = Dfs();
-		if (nextEdge != null) {
-			sendReply(nextEdge, true);
+		//nextEdge = Dfs();
+		//if (nextEdge != null) {
+			//sendReply(nextEdge, false);
 			useDFS = true;
-			System.err.println("complete " + nextEdge.from + " " + nextEdge.to);
-		}
-		
+			//System.err.println("complete " + nextEdge.from + " " + nextEdge.to);
+		//}
 
 		// Engstellen finden, wenn wir keine Engstelle finden
-		if (!useDFS) {
-			// System.err.println("engstelle"+nextEdge.from + " "+nextEdge.to);
+		if (useDFS) {
+			nextEdge = bestBottleNeckEdge(bottleNecks());
+			System.err.println("bottlenecks" + nextEdge.from + " "
+					+ nextEdge.to);
+			sendReply(nextEdge, true);
 
 			// Sonst eine andere Kante waehlen mit MaxCapacity
-			nextEdge = maxcapacity();
-			sendReply(nextEdge, true);
-			System.err.println("sonst " + nextEdge.from + " " + nextEdge.to);
+			//nextEdge = maxcapacity();
+			sendReply(nextEdge, false);
+			//System.err.println("sonst " + nextEdge.from + " " + nextEdge.to);
 			// Send final reply indicating that we won't change our mind any
 			// more.
-			// sendReply(nextEdge, true);
+			sendReply(nextEdge, true);
 		}
 	}
 
@@ -114,22 +116,24 @@ public class DiePaten extends FVSPlayer {
 	 * 
 	 * @return nextEges, the list with the bottlenecks-edges
 	 */
-	private ArrayList<betterEdge> bottleNecks()  {
-		ArrayList<betterEdge> nextEdges = new ArrayList<DiePaten.betterEdge>();
+	private ArrayList<betterEdge> bottleNecks() {
+		ArrayList<betterEdge> nextEdges = new ArrayList<betterEdge>();
 
 		int tempMatrix[][] = new int[size][size];
 
+		int[][] intCapacity = stringMatrixToInt(capacityMatrix);
 		for (int l = 0; l < size; l++) {
 			for (int k = 0; k < size; k++) {
-				int temp = Integer.parseInt(capacityMatrix[l][k]);
-				if (temp > 0 && adjacencyMatrix[l][k] == UNSELECTED_EDGE) {
+
+				if (intCapacity[l][k] > 0
+						&& adjacencyMatrix[l][k] == UNSELECTED_EDGE) {
 					tempMatrix[l][k] = 1;
+
 				} else {
 					tempMatrix[l][k] = 0;
 				}
 			}
 		}
-
 		nextEdges = minCut(tempMatrix);
 
 		return nextEdges;
@@ -144,11 +148,12 @@ public class DiePaten extends FVSPlayer {
 	 */
 	public Edge bestBottleNeckEdge(ArrayList<betterEdge> bottleNecks) {
 		int[][] intCapacity = stringMatrixToInt(capacityMatrix);
-		betterEdge bestEdge = new betterEdge(bottleNecks.get(0).getFrom(), bottleNecks.get(0).getTo(), intCapacity);
-		
+		betterEdge bestEdge = new betterEdge(bottleNecks.get(0).getFrom(),bottleNecks.get(0).getTo(), intCapacity);
+
 		// searching for the edge with maximum capacity
 		for (betterEdge edge : bottleNecks) {
-			if (intCapacity[edge.getFrom()][edge.getTo()] > bestEdge.getCapacity()) {
+			if (intCapacity[edge.getFrom()][edge.getTo()] >= bestEdge
+					.getCapacity() && adjacencyMatrix[edge.getFrom()][edge.getTo()] == UNSELECTED_EDGE) {
 				bestEdge = edge;
 				bestEdge.setCapacity(intCapacity[edge.getFrom()][edge.getTo()]);
 			}
@@ -199,7 +204,7 @@ public class DiePaten extends FVSPlayer {
 		public void setCapacity(int capacity) {
 			this.capacity = capacity;
 		}
-		
+
 		/**
 		 * 
 		 * @return from, the startnode
@@ -207,7 +212,7 @@ public class DiePaten extends FVSPlayer {
 		public int getFrom() {
 			return from;
 		}
-		
+
 		/**
 		 * 
 		 * @return to, the endnode
@@ -309,12 +314,14 @@ public class DiePaten extends FVSPlayer {
 		String[][] restCapacityString = new String[size][size];
 		String[][] capacityMatrixString = new String[size][size];
 
-		restCapacityString = intMatrixToString(restCapacityGlobal);
-		capacityMatrixString = intMatrixToString(capacityMatrix);
+
+		capacityMatrixString = this.capacityMatrix;
 
 		// to compute the max-flow
 		maxFlow(adjacencyMatrix, capacityMatrixString, source, sink);
 		// to get the source_Set of the global queue-array
+		restCapacityString = intMatrixToString(restCapacityGlobal);
+		
 		maxFlow(adjacencyMatrix, restCapacityString, source, sink);
 		// put it in source_Set arraylist
 		for (int i = 0; i < queue.length; i++) {
@@ -388,9 +395,12 @@ public class DiePaten extends FVSPlayer {
 	 */
 	public int[][] stringMatrixToInt(String[][] stringMatrix) {
 		int[][] intMatrix = new int[size][size];
-		;
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
+				if (stringMatrix[i][j].equals("")
+						|| stringMatrix[i][j].equals(null)) {
+					stringMatrix[i][j] = "0";
+				}
 				intMatrix[i][j] = Integer.parseInt(stringMatrix[i][j]);
 			}
 		}
@@ -406,11 +416,12 @@ public class DiePaten extends FVSPlayer {
 	 */
 	public String[][] intMatrixToString(int[][] intMatrix) {
 		String[][] stringMatrix = new String[size][size];
-		;
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
 				stringMatrix[i][j] = Integer.toString(intMatrix[i][j]);
+
 			}
+
 		}
 		return stringMatrix;
 	}
