@@ -135,6 +135,38 @@ public class DiePaten extends FVSPlayer {
 			this.capacity = capacity;
 		}
 	}
+	
+	/**
+	 * determine the number of edges which flow into this node
+	 * @param node,
+	 * @param matrix
+	 * @return in_degree
+	 */
+	public int inDegree(int node, int[][] matrix) {
+		int in_degree = 0;
+		for (int i = 0; i < size; i++) {
+			if (matrix[i][node] == 1 || matrix[i][node] == 2) {
+				in_degree++;
+			}
+		}
+		return in_degree;
+	}
+	
+	/**
+	 * determine the number of edges which have its source from this node
+	 * @param node,
+	 * @param matrix
+	 * @return in_degree
+	 */
+	public int outDegree(int node, int[][] matrix) {
+		int out_degree = 0;
+		for (int i = 0; i < size; i++) {
+			if (matrix[node][i] == 1 || matrix[i][node] == 2) {
+				out_degree++;
+			}
+		}
+		return out_degree;
+	}
 
 	/**
 	 * method to choose the next edge with maximum capacity
