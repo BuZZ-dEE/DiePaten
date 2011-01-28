@@ -239,7 +239,7 @@ public class DiePaten extends FVSPlayer {
 		}
 		for (int z = 0; z < source_Set.size(); z++) {
 			if (sink_Set.contains(source_Set.get(z))) {
-				sink_Set.remove(sink_Set.indexOf(source_Set.get(z)));
+				sink_Set.remove(source_Set.get(z));
 			}
 		}
 		
