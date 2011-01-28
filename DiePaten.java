@@ -10,12 +10,12 @@ import java.util.Stack;
 public class DiePaten extends FVSPlayer {
 
 	public static final int WHITE = 0, GRAY = 1, BLACK = 2;
-	private int[] dfscolor, color, minCapacity, parent, queue;
+	private int[]  color, minCapacity, parent, queue;
 	private int first, last, size;
 	int[][] flow, restCapacity;
-	Stack<Integer> stack = new Stack();
-	Stack<Integer> nextstack = new Stack();
-	List<Stack> stackList = new LinkedList<Stack>();
+	Stack<Integer> stack = new Stack<Integer>();
+	Stack<Integer> nextstack = new Stack<Integer>();
+	List<Stack<Integer>> stackList = new LinkedList<Stack<Integer>>();
 
 	
 	public DiePaten() {
@@ -388,34 +388,6 @@ public class DiePaten extends FVSPlayer {
 	}
 	
 
-	private void dfs() {
-		for (int i = 0; i < adjacencyMatrix.length; i++) {
-			dfscolor = new int[size];
-			dfscolor[i] = WHITE;
-		}
-		for (int i = 0; i < adjacencyMatrix.length; i++) {
-			if(dfscolor[i] == WHITE) {
-				dSearchVisit(dfscolor[i]);
-				
-			}
-			
-		}
-	}
-	
-	private void dSearchVisit(int tmp) {
-		dfscolor[tmp] = GRAY;
-		for ( int i = 0; i < adjacencyMatrix.length; i++) {
-			if(adjacencyMatrix[tmp][i] == 1) { 
-				if(dfscolor[i] == WHITE){
-					dSearchVisit(i);
-				}
-			}
-			dfscolor[tmp] = 
-				BLACK;
-		}
-	}
-	
-
 	/**
 	 * breadth-first search method
 	 * @param source, the source-node
@@ -457,21 +429,124 @@ public class DiePaten extends FVSPlayer {
 		return augmentedPathExits;
 	}
 	
-	//Tiefensuche
-	private boolean TFS(int source){
-		boolean v = false;
-		
-		for (int i = 0; i < size; i++){
-			color[i] = WHITE;
-			minCapacity[i] = Integer.MAX_VALUE;
+	// Modifizierte Tiefensuche, die jeden Weg im Graphen berechnet
+	// Für diese Suche werden 2 Stacks benutzt. Auf dem ersten Stack werden
+	// die aktuellen Knoten des Weges gespeichert und auf dem anderen Stack
+	// werden
+	// die aktuellen Positionen gespeichert um weitere Nachbarknoten zu finden
+	public Edge Dfs() {
+		stack.push(source);
+		nextstack.push(0);
+		Edge result = null;
+		boolean finished = false;
+
+		// Solange wir nicht alle Wege gefunden habe -> führe diese Schleife aus
+		while (!finished) {
+
+			// Wenn der Wege-Stack leer ist, sind wir fertig und haben alle Wege
+			// gefunden
+			// und suchen nun in checkGaps() nach einer Lücke in einem Weg
+			if (stack.empty()) {
+				finished = true;
+				checkGaps();
+				break;
+			}
+
+			// Wenn das oberste Element von nextstack kleiner als die Anzahl der
+			// Knoten
+			// ist, können wir noch weiter nach Nachbarsknoten suchen
+			while (nextstack.peek() <= adjacencyMatrix.length) {
+
+				// Wenn das oberste Element der Anzahl der Knoten entspricht,
+				// gibt
+				// es keine weiteren Kindsknoten und wir können die oberen
+				// Elemente
+				// des Stacks entfernen
+				if (nextstack.peek() == adjacencyMatrix.length) {
+					stack.pop();
+					nextstack.pop();
+					break;
+				}
+
+				// Wir suchen das nächste Kind vom aktuellen Knoten
+				int i = nextstack.peek();
+
+				if (adjacencyMatrix[stack.peek()][i] == UNSELECTED_EDGE
+						|| adjacencyMatrix[stack.peek()][i] == FLOW_EDGE) {
+
+					// Wenn das Kind die Senke ist, speichern wir den Weg ab
+					if (nextstack.peek() == sink) {
+						stack.push(i);
+						int tmp3 = nextstack.pop();
+						nextstack.push(++tmp3);
+						stackList.add((Stack<Integer>)stack.clone());
+						stack.pop();
+						break;
+					}
+					// Wenn kein Kind gefunden wurde, wird an der nächsten
+					// Position gesucht
+					// und inkrementieren den nextstack
+					int tmp = nextstack.pop();
+					nextstack.push(++tmp);
+
+					// Wurde ein Kind gefunden, packen wir es auf den stack und
+					// packen eine weiter 0 als Positionsanzeige auf den
+					// nextstack
+					stack.push(i);
+					nextstack.push(0);
+
+				}// Kein Kind gefunden
+				else {
+					int tmp = nextstack.pop();
+					nextstack.push(++tmp);
+				}
+			}
 		}
-		
-		first = last = 0;
-		queue[last++] = source;
-		color[source] = GRAY;
-		
-		return v;
+		return result;
 	}
+
+	// checkGaps() prüft, ob es Wege gibt, bei denen nur noch eine Kante
+	// zum komplettieren fehlt
+	public Edge checkGaps() {
+		Edge result = null;
+		// Geht alle Stacks in der Stackliste durch
+		for (int i = 0; i < stackList.size(); i++) {
+			int counter = 0;
+			// Geht den i-ten Weg der Stackliste durch
+			for (int k = 0; k < stackList.get(i).size() - 1; k++) {
+
+				// Prüft, ob es unselektierte Kanten im Weg gibt
+				// Wenn es eine gibt, erhöhe den Counter und übergebe die Kante
+				if (adjacencyMatrix[stackList.get(i).get(k)][stackList.get(i)
+						.get((k + 1))] == 1) {
+					counter++;
+					result = new Edge(stackList.get(i).get(k), stackList.get(i)
+							.get(k + 1));
+				}
+				// Wenn eine Kante im Weg für die Polizei markiert ist,
+				// ignoriere den Weg, da dieser nicht mehr komplettiert werden
+				// kann
+				else if (adjacencyMatrix[stackList.get(i).get(k)][stackList
+						.get(i).get(k + 1)] == 3) {
+					k = stackList.get(i).size() - 1;
+					break;
+				}
+
+			}
+			// Wurde ein Weg durchlaufen und es wurde nur eine unselektierte
+			// Kante gefunden, breche die Schleife ab
+			if (counter == 1) {
+				break;
+			}
+		}
+		// Gib die unselektierte Kante aus, die zum Komplettieren des Weges
+		// führt
+		return result;
+
+	}
+
+	
+
 
 	// Do not edit!
 	public static void main(String args[]) throws IOException {
