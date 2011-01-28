@@ -55,8 +55,8 @@ public class DiePaten extends FVSPlayer {
 	 * method to find the bottlenecks in the graph. every edge is set to 1 before
 	 * @return nextEges, the list with the bottlenecks-edges
 	 */
-	private ArrayList<Edge> bottleNecks() {
-		ArrayList<Edge> nextEdges = null;
+	private ArrayList<betterEdge> bottleNecks() {
+		ArrayList<betterEdge> nextEdges = new ArrayList<DiePaten.betterEdge>();
 
 		int tempMatrix[][] = new int[size][size];
 
@@ -71,9 +71,9 @@ public class DiePaten extends FVSPlayer {
 			}
 		} 
 		
-		//tempMatrix, getMincut
+		// tempMatrix, getMincut
 		nextEdges = minCut(tempMatrix);
-		//TODO - Entscheiden
+		// TODO - Entscheiden
 		return nextEdges;
 	}
 	
@@ -82,8 +82,15 @@ public class DiePaten extends FVSPlayer {
 	 * @param bottleNecks, list with the bootlenecks edges
 	 * @return bestEdge, the most interesting edge from bootlenecks
 	 */
-	public Edge bestBottleNeckEdge(ArrayList<Edge> bottleNecks) {
-		Edge bestEdge = null;
+	public Edge bestBottleNeckEdge(ArrayList<betterEdge> bottleNecks) {
+		betterEdge bestEdge = bottleNecks.get(0);
+		
+		// searching for the edge with maximum capacity
+		for (betterEdge edge : bottleNecks) {
+			if (edge.getCapacity() > bestEdge.getCapacity()) {
+				bestEdge = edge;
+			}
+		}
 		
 		return bestEdge;
 	}
@@ -95,10 +102,37 @@ public class DiePaten extends FVSPlayer {
 	 */
 	class betterEdge extends Edge {
 		private int capacity;
-		public betterEdge(int from, int to, int capacity) {
+		public betterEdge(int from, int to, int[][] capacity) {
 			super(from, to);
-			this.capacity = capacity;
+			this.capacity = capacity[from][to];
 			
+		}
+	
+		// TODO how can we use that???
+		public ArrayList<betterEdge> initializeBetterEdge() {
+			ArrayList<betterEdge> betterEdgeList = new ArrayList<DiePaten.betterEdge>();
+			for (int i = 0; i < size; i++) {
+				for (int j = 0; j < size; j++) {
+					if (adjacencyMatrix[i][j] == UNSELECTED_EDGE) {
+						//betterEdgeList.add(new betterEdge(i, j, capacity));
+					}
+				}
+			}
+			return betterEdgeList;
+		}
+
+		/**
+		 * @return the capacity
+		 */
+		public int getCapacity() {
+			return capacity;
+		}
+
+		/**
+		 * @param capacity the capacity to set
+		 */
+		public void setCapacity(int capacity) {
+			this.capacity = capacity;
 		}
 	}
 
@@ -213,11 +247,11 @@ public class DiePaten extends FVSPlayer {
 	 * @param capacityMatrix
 	 * @return min-cut
 	 */
-	public ArrayList<Edge> minCut(int[][] capacityMatrix) {
-		ArrayList<Edge> min_Cut = new ArrayList<Edge>();
+	public ArrayList<betterEdge> minCut(int[][] capacityMatrix) {
+		ArrayList<betterEdge> min_Cut = new ArrayList<betterEdge>();
 		ArrayList<Integer> source_Set = new ArrayList<Integer>();
 		ArrayList<Integer> sink_Set = new ArrayList<Integer>();
-		Edge edge;
+		betterEdge edge;
 		
 		source_Set = sourceSet(capacityMatrix);
 		sink_Set = sinkSet(capacityMatrix);
@@ -225,7 +259,7 @@ public class DiePaten extends FVSPlayer {
 		for (int q = 0; q < source_Set.size(); q++) {
 			for (int s = 0; s < sink_Set.size(); s++) {
 				if (adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 1 || adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 2) {
-					edge = new Edge(source_Set.get(q), sink_Set.get(s));
+					edge = new betterEdge(source_Set.get(q), sink_Set.get(s), capacityMatrix); // TODO is that the right capacity???
 					min_Cut.add(edge);
 				}
 			}
