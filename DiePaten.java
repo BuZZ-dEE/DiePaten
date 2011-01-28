@@ -41,9 +41,11 @@ public class DiePaten extends FVSPlayer {
 		System.err.println("flow");
 		Edge nextEdge = null;
 
-		//nextEdge = bottleNecks();
+		nextEdge = bottleNecks().get(0);
+		sendReply(nextEdge, true);
+		
 		// nextEdge=maxcapacity();
-		System.out.println(maxFlow(adjacencyMatrix, capacityMatrix, source, sink));
+		nextEdge = minCut(stringMatrixToInt(capacityMatrix)).get(0);
 		// Send final reply indicating that we won't change our mind any more.
 		sendReply(nextEdge, true);
 	}
@@ -71,7 +73,7 @@ public class DiePaten extends FVSPlayer {
 		
 		//tempMatrix, getMincut
 		nextEdges = minCut(tempMatrix);
-
+		//TODO - Entscheiden
 		return nextEdges;
 	}
 
@@ -106,7 +108,7 @@ public class DiePaten extends FVSPlayer {
 		 * Start of sample strategy. Replace this with your own code.
 		 */
 		System.err.println("cut");
-		System.out.println(maxFlow(adjacencyMatrix, capacityMatrix, source, sink));
+		System.err.println(maxFlow(adjacencyMatrix, capacityMatrix, source, sink));
 		// even poorer strategy: select a random edge
 		Edge nextEdge = null;
 		nextEdge = random();
@@ -140,16 +142,11 @@ public class DiePaten extends FVSPlayer {
 	public ArrayList<Integer> sourceSet(int[][] capacityMatrix) {
 		ArrayList<Integer> source_Set = new ArrayList<Integer>();
 		
-		// restCapacity array to string-array
-		String[][] restCapacityString = new String[restCapacity.length][restCapacity.length];
-		String[][] capacityMatrixString = new String[restCapacity.length][restCapacity.length];
-		for(int i = 0; i < restCapacity.length; i++) {
-			//restCapacityString[i] = new String[ restCapacity[i].length ];
-		    for(int j = 0; j < restCapacity[i].length; j++) {
-		    	restCapacityString[i][j] = Integer.toString( restCapacity[i][j] );
-		    	capacityMatrixString[i][j] = Integer.toString( capacityMatrix[i][j] );
-		    }
-		}
+		String[][] restCapacityString = new String[size][size];
+		String[][] capacityMatrixString = new String[size][size];
+		
+		restCapacityString = intMatrixToString(restCapacity);
+		capacityMatrixString = intMatrixToString(capacityMatrix);
 
 		// to compute the max-flow
 		maxFlow(adjacencyMatrix, capacityMatrixString, source, sink);
@@ -211,6 +208,39 @@ public class DiePaten extends FVSPlayer {
 		 
 		return min_Cut;
 	}
+	
+
+	/**
+	 * method to convert a stringmatrix to an intmatrix
+	 * @param stringMatrix, which is converted to an intmatrix
+	 * @return intMatrix
+	 */
+	public int[][] stringMatrixToInt(String[][] stringMatrix) {
+		int[][] intMatrix = new int[size][size];;
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				intMatrix[i][j] = Integer.parseInt(stringMatrix[i][j]);
+			}
+		}
+		return intMatrix;
+	}
+	
+	
+	/**
+	 * method to convert a intmatrix to an stringmatrix
+	 * @param intMatrix, which is converted to a stringmatrix
+	 * @return stringMatrix
+	 */
+	public String[][] intMatrixToString(int[][] intMatrix) {
+		String[][] stringMatrix = new String[size][size];;
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				stringMatrix[i][j] = Integer.toString(intMatrix[i][j]);
+			}
+		}
+		return stringMatrix;
+	}
+	
 
 	/**
 	 * Method to compute the max-flow of the given graph
@@ -239,11 +269,8 @@ public class DiePaten extends FVSPlayer {
 		color = new int[size];
 		queue = new int[size];
 		
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				restCapacity[i][j] = Integer.parseInt(capacityMatrix[i][j]);
-			}
-		}
+		restCapacity = stringMatrixToInt(capacityMatrix);
+		
 		
 		while(BFS(source)) {
 			maxflow += minCapacity[sink];
