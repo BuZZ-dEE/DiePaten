@@ -38,7 +38,7 @@ public class DiePaten extends FVSPlayer {
 	public DiePaten() {
 		// Set your team name here
 		// Prior to sending the code in you should turn debugging off.
-		super("DiePaten", true);
+		super("DiePaten", false);
 
 		//
 	}
@@ -65,48 +65,82 @@ public class DiePaten extends FVSPlayer {
 		System.err.println("flow");
 
 		// Random, um eine Antwort zu Sichern
-		Edge nextEdge = null;
-		// sendReply(nextEdge, true);
+		Edge nextEdge = random();
+		sendReply(nextEdge, false);
 		//System.err.println("random " + nextEdge.from + " " + nextEdge.to);
 
 		// Wege kompletieren
-		//nextEdge = Dfs();
-		//if (nextEdge != null) {
-			//sendReply(nextEdge, false);
+		nextEdge = Dfs();
+		if (nextEdge != null) {
+			sendReply(nextEdge, true);
 			useDFS = true;
 			//System.err.println("complete " + nextEdge.from + " " + nextEdge.to);
-		//}
+		}
 
 		// Engstellen finden, wenn wir keine Engstelle finden
-		if (useDFS) {
+		if (!useDFS) {
 			nextEdge = bestBottleNeckEdge(bottleNecks());
-			System.err.println("bottlenecks" + nextEdge.from + " "
-					+ nextEdge.to);
-			sendReply(nextEdge, true);
+			//System.err.println("bottlenecks" + nextEdge.from + " "+ nextEdge.to);
+			
+			if(nextEdge != null){
+				sendReply(nextEdge, false);
 
-			// Sonst eine andere Kante waehlen mit MaxCapacity
-			//nextEdge = maxcapacity();
-			sendReply(nextEdge, false);
+			}
+			else{
+				// Sonst eine andere Kante waehlen mit MaxCapacity
+				nextEdge = maxcapacity();
+				sendReply(nextEdge, false);
+			}
+			
 			//System.err.println("sonst " + nextEdge.from + " " + nextEdge.to);
 			// Send final reply indicating that we won't change our mind any
 			// more.
-			sendReply(nextEdge, true);
+			
 		}
+		sendReply(nextEdge, true);
 	}
 
 	// Implement your cut strategy
 	protected void handle_cut() {
+		size = this.adjacencyMatrix.length;
 		/*
 		 * Start of sample strategy. Replace this with your own code.
 		 */
-		size = this.adjacencyMatrix.length;
-		System.err.println("cut");
-		System.err.println(maxFlow(adjacencyMatrix, capacityMatrix, source,
-				sink));
-		// even poorer strategy: select a random edge
-		Edge nextEdge = null;
-		nextEdge = random();
+		System.err.println("flow");
 
+		// Random, um eine Antwort zu Sichern
+		Edge nextEdge = random();
+		sendReply(nextEdge, false);
+		//System.err.println("random " + nextEdge.from + " " + nextEdge.to);
+
+		// Wege kompletieren
+		nextEdge = Dfs();
+		if (nextEdge != null) {
+			sendReply(nextEdge, true);
+			useDFS = true;
+			//System.err.println("complete " + nextEdge.from + " " + nextEdge.to);
+		}
+
+		// Engstellen finden, wenn wir keine Engstelle finden
+		if (!useDFS) {
+			nextEdge = bestBottleNeckEdge(bottleNecks());
+			//System.err.println("bottlenecks" + nextEdge.from + " "+ nextEdge.to);
+			
+			if(nextEdge != null){
+				sendReply(nextEdge, false);
+
+			}
+			else{
+				// Sonst eine andere Kante waehlen mit MaxCapacity
+				nextEdge = maxcapacity();
+				sendReply(nextEdge, false);
+			}
+			
+			//System.err.println("sonst " + nextEdge.from + " " + nextEdge.to);
+			// Send final reply indicating that we won't change our mind any
+			// more.
+			
+		}
 		sendReply(nextEdge, true);
 	}
 
@@ -373,8 +407,7 @@ public class DiePaten extends FVSPlayer {
 
 		for (int q = 0; q < source_Set.size(); q++) {
 			for (int s = 0; s < sink_Set.size(); s++) {
-				if (adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 1
-						|| adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 2) {
+				if (adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 1) {
 					edge = new betterEdge(source_Set.get(q), sink_Set.get(s),
 							capacityMatrix); // TODO is that the right
 												// capacity???
