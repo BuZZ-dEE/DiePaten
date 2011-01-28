@@ -106,7 +106,7 @@ public class DiePaten extends FVSPlayer {
 	 * method to find the bottlenecks in the graph. every edge is set to 1 before
 	 * @return nextEges, the list with the bottlenecks-edges
 	 */
-	private ArrayList<betterEdge> bottleNecks() {
+	private ArrayList<betterEdge> bottleNecks()  {
 		ArrayList<betterEdge> nextEdges = new ArrayList<DiePaten.betterEdge>();
 
 		int tempMatrix[][] = new int[size][size];
@@ -133,12 +133,14 @@ public class DiePaten extends FVSPlayer {
 	 * @return bestEdge, the most interesting edge from bootlenecks
 	 */
 	public Edge bestBottleNeckEdge(ArrayList<betterEdge> bottleNecks) {
-		betterEdge bestEdge = bottleNecks.get(0);
+		int[][] intCapacity = stringMatrixToInt(capacityMatrix);
+		betterEdge bestEdge = new betterEdge(bottleNecks.get(0).getFrom(), bottleNecks.get(0).getTo(), intCapacity);
 		
 		// searching for the edge with maximum capacity
 		for (betterEdge edge : bottleNecks) {
-			if (edge.getCapacity() > bestEdge.getCapacity()) {
+			if (intCapacity[edge.getFrom()][edge.getTo()] > bestEdge.getCapacity()) {
 				bestEdge = edge;
+				bestEdge.setCapacity(intCapacity[edge.getFrom()][edge.getTo()]);
 			}
 		}
 		
@@ -183,6 +185,22 @@ public class DiePaten extends FVSPlayer {
 		 */
 		public void setCapacity(int capacity) {
 			this.capacity = capacity;
+		}
+		
+		/**
+		 * 
+		 * @return from, the startnode
+		 */
+		public int getFrom() {
+			return from;
+		}
+		
+		/**
+		 * 
+		 * @return to, the endnode
+		 */
+		public int getTo() {
+			return to;
 		}
 	}
 	
