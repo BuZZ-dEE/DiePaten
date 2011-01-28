@@ -12,7 +12,7 @@ public class DiePaten extends FVSPlayer {
 	public static final int WHITE = 0, GRAY = 1, BLACK = 2;
 	private int[]  color, minCapacity, parent, queue;
 	private int first, last, size;
-	int[][] flow, restCapacity;
+	int[][] flow, restCapacity, restCapacityGlobal;
 	Stack<Integer> stack = new Stack<Integer>();
 	Stack<Integer> nextstack = new Stack<Integer>();
 	List<Stack<Integer>> stackList = new LinkedList<Stack<Integer>>();
@@ -242,7 +242,7 @@ public class DiePaten extends FVSPlayer {
 		String[][] restCapacityString = new String[size][size];
 		String[][] capacityMatrixString = new String[size][size];
 		
-		restCapacityString = intMatrixToString(restCapacity);
+		restCapacityString = intMatrixToString(restCapacityGlobal);
 		capacityMatrixString = intMatrixToString(capacityMatrix);
 
 		// to compute the max-flow
@@ -251,8 +251,10 @@ public class DiePaten extends FVSPlayer {
 		maxFlow(adjacencyMatrix, restCapacityString, source, sink);
 		// put it in source_Set arraylist
 		for (int i = 0; i < queue.length; i++) {
-			source_Set.add(queue[i]);
+			if(!source_Set.contains(queue[i])) {
+				source_Set.add(queue[i]);
 		}
+	}
 		
 		return source_Set;
 	}
@@ -383,7 +385,8 @@ public class DiePaten extends FVSPlayer {
 			}
 		}
 		
-
+		restCapacityGlobal = restCapacity;
+		
 		return maxflow;
 	}
 	
