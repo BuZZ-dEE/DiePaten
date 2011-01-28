@@ -1,14 +1,20 @@
 import java.io.IOException;
 import java.lang.Object;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
 /**
  * Fill this class with your own strategy.
  */
 public class DiePaten extends FVSPlayer {
 
 	public static final int WHITE = 0, GRAY = 1, BLACK = 2;
-	private int[] color, minCapacity, parent, queue;
+	private int[] dfscolor, color, minCapacity, parent, queue;
 	private int first, last, size;
 	int[][] flow, restCapacity;
+	Stack<Integer> stack = new Stack();
+	Stack<Integer> nextstack = new Stack();
+	List<Stack> stackList = new LinkedList<Stack>();
 
 	
 	public DiePaten() {
@@ -158,6 +164,32 @@ public class DiePaten extends FVSPlayer {
 		return maxflow;
 	}
 	
+	private void dfs() {
+		for (int i = 0; i < adjacencyMatrix.length; i++) {
+			dfscolor = new int[size];
+			dfscolor[i] = WHITE;
+		}
+		for (int i = 0; i < adjacencyMatrix.length; i++) {
+			if(dfscolor[i] == WHITE) {
+				dSearchVisit(dfscolor[i]);
+				
+			}
+			
+		}
+	}
+	
+	private void dSearchVisit(int tmp) {
+		dfscolor[tmp] = GRAY;
+		for ( int i = 0; i < adjacencyMatrix.length; i++) {
+			if(adjacencyMatrix[tmp][i] == 1) { 
+				if(dfscolor[i] == WHITE){
+					dSearchVisit(i);
+				}
+			}
+			dfscolor[tmp] = 
+				BLACK;
+		}
+	}
 	
 	private boolean BFS(int source) {
 		boolean augmentedPathExits = false;
