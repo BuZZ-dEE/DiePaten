@@ -231,11 +231,6 @@ public class DiePaten extends FVSPlayer {
 		
 		for (int i = 0; i < size; i++) {
 			sink_Set.add(i);
-//			for (int j = 0; j < source_Set.size(); j++) {
-//				if (source_Set.indexOf(j) == sink_Set.indexOf(i)) {
-//					sink_Set.remove(i);
-//				}
-//			}
 		}
 		for (int z = 0; z < source_Set.size(); z++) {
 			if (sink_Set.contains(source_Set.get(z))) {
