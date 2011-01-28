@@ -76,6 +76,31 @@ public class DiePaten extends FVSPlayer {
 		//TODO - Entscheiden
 		return nextEdges;
 	}
+	
+	/**
+	 * method to choose the most interesting edge from the bottlenecks arraylist
+	 * @param bottleNecks, list with the bootlenecks edges
+	 * @return bestEdge, the most interesting edge from bootlenecks
+	 */
+	public Edge bestBottleNeckEdge(ArrayList<Edge> bottleNecks) {
+		Edge bestEdge = null;
+		
+		return bestEdge;
+	}
+	
+	/**
+	 * inner class to extend the edge-class with a few useful attributes
+	 * @author BuZZ-dEE
+	 *
+	 */
+	class betterEdge extends Edge {
+		private int capacity;
+		public betterEdge(int from, int to, int capacity) {
+			super(from, to);
+			this.capacity = capacity;
+			
+		}
+	}
 
 	/**
 	 * method to choose the next edge with maximum capacity
