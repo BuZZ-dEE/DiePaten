@@ -1,8 +1,12 @@
 import java.io.IOException;
+<<<<<<< HEAD:DiePaten.java
 import java.lang.Object;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+=======
+import java.util.ArrayList;
+>>>>>>> a7cac5bb2103ce03e5aa232b8dcc091406521da7:DiePaten.java
 /**
  * Fill this class with your own strategy.
  */
@@ -47,24 +51,27 @@ public class DiePaten extends FVSPlayer {
 		System.err.println("flow");
 		Edge nextEdge = null;
 
-		nextEdge = bottleNecks();
+		nextEdge = bottleNecks().get(0);
+		sendReply(nextEdge, true);
+		
 		// nextEdge=maxcapacity();
-
+		nextEdge = minCut(stringMatrixToInt(capacityMatrix)).get(0);
 		// Send final reply indicating that we won't change our mind any more.
 		sendReply(nextEdge, true);
 	}
 
 
-	// Engstellen im Graphen finden
-	// Kapazitaeten auf eins setzten und dann den Mincut finden
-	private Edge bottleNecks() {
-		Edge nextEdge = null;
-		int zero = 0;
-		int groesse = this.capacityMatrix.length;
-		int tempMatrix[][] = new int[groesse][groesse];
+	/**
+	 * method to find the bottlenecks in the graph. every edge is set to 1 before
+	 * @return nextEges, the list with the bottlenecks-edges
+	 */
+	private ArrayList<betterEdge> bottleNecks() {
+		ArrayList<betterEdge> nextEdges = new ArrayList<DiePaten.betterEdge>();
 
-		for (int l = 0; l < groesse; l++) {
-			for (int k = 0; k < groesse; k++) {
+		int tempMatrix[][] = new int[size][size];
+
+		for (int l = 0; l < size; l++) {
+			for (int k = 0; k < size; k++) {
 				int temp = Integer.parseInt(capacityMatrix[l][k]);
 				if (temp > 0 && adjacencyMatrix[l][k] == UNSELECTED_EDGE) {
 					tempMatrix[l][k] = 1;
@@ -72,13 +79,109 @@ public class DiePaten extends FVSPlayer {
 					tempMatrix[l][k] = 0;
 				}
 			}
+		} 
+		
+		// tempMatrix, getMincut
+		nextEdges = minCut(tempMatrix);
+		// TODO - Entscheiden
+		return nextEdges;
+	}
+	
+	/**
+	 * method to choose the most interesting edge from the bottlenecks arraylist
+	 * @param bottleNecks, list with the bootlenecks edges
+	 * @return bestEdge, the most interesting edge from bootlenecks
+	 */
+	public Edge bestBottleNeckEdge(ArrayList<betterEdge> bottleNecks) {
+		betterEdge bestEdge = bottleNecks.get(0);
+		
+		// searching for the edge with maximum capacity
+		for (betterEdge edge : bottleNecks) {
+			if (edge.getCapacity() > bestEdge.getCapacity()) {
+				bestEdge = edge;
+			}
 		}
 		
-		//tempMatrix, getMincut
+		return bestEdge;
+	}
+	
+	/**
+	 * inner class to extend the edge-class with a few useful attributes
+	 * @author BuZZ-dEE
+	 *
+	 */
+	class betterEdge extends Edge {
+		private int capacity;
+		public betterEdge(int from, int to, int[][] capacity) {
+			super(from, to);
+			this.capacity = capacity[from][to];
+			
+		}
+	
+		// TODO how can we use that???
+		public ArrayList<betterEdge> initializeBetterEdge() {
+			ArrayList<betterEdge> betterEdgeList = new ArrayList<DiePaten.betterEdge>();
+			for (int i = 0; i < size; i++) {
+				for (int j = 0; j < size; j++) {
+					if (adjacencyMatrix[i][j] == UNSELECTED_EDGE) {
+						//betterEdgeList.add(new betterEdge(i, j, capacity));
+					}
+				}
+			}
+			return betterEdgeList;
+		}
 
-		return nextEdge;
+		/**
+		 * @return the capacity
+		 */
+		public int getCapacity() {
+			return capacity;
+		}
+
+		/**
+		 * @param capacity the capacity to set
+		 */
+		public void setCapacity(int capacity) {
+			this.capacity = capacity;
+		}
+	}
+	
+	/**
+	 * determine the number of edges which flow into this node
+	 * @param node,
+	 * @param matrix
+	 * @return in_degree
+	 */
+	public int inDegree(int node, int[][] matrix) {
+		int in_degree = 0;
+		for (int i = 0; i < size; i++) {
+			if (matrix[i][node] == 1 || matrix[i][node] == 2) {
+				in_degree++;
+			}
+		}
+		return in_degree;
+	}
+	
+	/**
+	 * determine the number of edges which have its source from this node
+	 * @param node,
+	 * @param matrix
+	 * @return in_degree
+	 */
+	public int outDegree(int node, int[][] matrix) {
+		int out_degree = 0;
+		for (int i = 0; i < size; i++) {
+			if (matrix[node][i] == 1 || matrix[i][node] == 2) {
+				out_degree++;
+			}
+		}
+		return out_degree;
 	}
 
+	/**
+	 * method to choose the next edge with maximum capacity
+	 * @return nextEdge, the next chosen edge
+	 */
 	private Edge maxcapacity() {
 		int maxCapacity = 0;
 		int numNodes = this.capacityMatrix.length;
@@ -106,7 +209,7 @@ public class DiePaten extends FVSPlayer {
 		 * Start of sample strategy. Replace this with your own code.
 		 */
 		System.err.println("cut");
-
+		System.err.println(maxFlow(adjacencyMatrix, capacityMatrix, source, sink));
 		// even poorer strategy: select a random edge
 		Edge nextEdge = null;
 		nextEdge = random();
@@ -114,6 +217,10 @@ public class DiePaten extends FVSPlayer {
 		sendReply(nextEdge, true);
 	}
 
+	/**
+	 * method to choose the next edge radomly
+	 * @return nextEdge, the next chosen edge
+	 */
 	private Edge random() {
 		Edge nextEdge = null;
 		int numNodes = this.capacityMatrix.length;
@@ -126,12 +233,135 @@ public class DiePaten extends FVSPlayer {
 		return nextEdge;
 
 	}
+	
+	
+	/**
+	 * Method to determine the nodes which are in the min-cut-source-set.
+	 * @param capacityMatrix
+	 * @return source_Set
+	 */
+	public ArrayList<Integer> sourceSet(int[][] capacityMatrix) {
+		ArrayList<Integer> source_Set = new ArrayList<Integer>();
+		
+		String[][] restCapacityString = new String[size][size];
+		String[][] capacityMatrixString = new String[size][size];
+		
+		restCapacityString = intMatrixToString(restCapacity);
+		capacityMatrixString = intMatrixToString(capacityMatrix);
 
+		// to compute the max-flow
+		maxFlow(adjacencyMatrix, capacityMatrixString, source, sink);
+		// to get the source_Set of the global queue-array
+		maxFlow(adjacencyMatrix, restCapacityString, source, sink);
+		// put it in source_Set arraylist
+		for (int i = 0; i < queue.length; i++) {
+			source_Set.add(queue[i]);
+		}
+		
+		return source_Set;
+	}
+	
+	/**
+	 * Method to determine the nodes which are in the min-cut-sink-set.
+	 * @param capacityMatrix
+	 * @return sink_Set
+	 */
+	public ArrayList<Integer> sinkSet(int[][] capacityMatrix) {
+		ArrayList<Integer> source_Set = new ArrayList<Integer>();
+		ArrayList<Integer> sink_Set = new ArrayList<Integer>();
+		source_Set = sourceSet(capacityMatrix);
+		
+		for (int i = 0; i < size; i++) {
+			sink_Set.add(i);
+		}
+		for (int z = 0; z < source_Set.size(); z++) {
+			if (sink_Set.contains(source_Set.get(z))) {
+				sink_Set.remove(source_Set.get(z));
+			}
+		}
+		
+		return sink_Set;
+	}
+	
+	
+	/**
+	 * determine the edges from source_set to sink_set
+	 * @param capacityMatrix
+	 * @return min-cut
+	 */
+	public ArrayList<betterEdge> minCut(int[][] capacityMatrix) {
+		ArrayList<betterEdge> min_Cut = new ArrayList<betterEdge>();
+		ArrayList<Integer> source_Set = new ArrayList<Integer>();
+		ArrayList<Integer> sink_Set = new ArrayList<Integer>();
+		betterEdge edge;
+		
+		source_Set = sourceSet(capacityMatrix);
+		sink_Set = sinkSet(capacityMatrix);
+		
+		for (int q = 0; q < source_Set.size(); q++) {
+			for (int s = 0; s < sink_Set.size(); s++) {
+				if (adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 1 || adjacencyMatrix[source_Set.get(q)][sink_Set.get(s)] == 2) {
+					edge = new betterEdge(source_Set.get(q), sink_Set.get(s), capacityMatrix); // TODO is that the right capacity???
+					min_Cut.add(edge);
+				}
+			}
+		}
+		 
+		return min_Cut;
+	}
+	
 
+	/**
+	 * method to convert a stringmatrix to an intmatrix
+	 * @param stringMatrix, which is converted to an intmatrix
+	 * @return intMatrix
+	 */
+	public int[][] stringMatrixToInt(String[][] stringMatrix) {
+		int[][] intMatrix = new int[size][size];;
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				intMatrix[i][j] = Integer.parseInt(stringMatrix[i][j]);
+			}
+		}
+		return intMatrix;
+	}
+	
+	
+	/**
+	 * method to convert a intmatrix to an stringmatrix
+	 * @param intMatrix, which is converted to a stringmatrix
+	 * @return stringMatrix
+	 */
+	public String[][] intMatrixToString(int[][] intMatrix) {
+		String[][] stringMatrix = new String[size][size];;
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				stringMatrix[i][j] = Integer.toString(intMatrix[i][j]);
+			}
+		}
+		return stringMatrix;
+	}
+	
+
+	/**
+	 * Method to compute the max-flow of the given graph
+	 * @param adjacencyMatrix, matrix with the edges that are used
+	 * @param capacityMatrix, matrix with the capacities for each edge
+	 * @param source, the source-node (start)
+	 * @param sink, the sink-node (target)
+	 * @return maxflow
+	 */
 	public int maxFlow(int[][] adjacencyMatrix, String[][] capacityMatrix,
 			int source, int sink) {
 		int maxflow = 0;
 		
+		for (int x = 0; x < size; x++) {
+			for (int y = 0; y < size; y++) {
+				if (adjacencyMatrix[x][y] == CUT_EDGE) {
+					capacityMatrix[x][y] = "0";
+				}
+			}
+		}
 		
 		flow = new int[size][size];
 		restCapacity = new int[size][size];
@@ -140,11 +370,8 @@ public class DiePaten extends FVSPlayer {
 		color = new int[size];
 		queue = new int[size];
 		
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
-				restCapacity[i][j] = Integer.parseInt(capacityMatrix[i][j]);
-			}
-		}
+		restCapacity = stringMatrixToInt(capacityMatrix);
+		
 		
 		while(BFS(source)) {
 			maxflow += minCapacity[sink];
@@ -164,6 +391,7 @@ public class DiePaten extends FVSPlayer {
 		return maxflow;
 	}
 	
+<<<<<<< HEAD:DiePaten.java
 	private void dfs() {
 		for (int i = 0; i < adjacencyMatrix.length; i++) {
 			dfscolor = new int[size];
@@ -191,6 +419,14 @@ public class DiePaten extends FVSPlayer {
 		}
 	}
 	
+=======
+	/**
+	 * breadth-first search method
+	 * @param source, the source-node
+	 * @return true, if augmentedPathExits exists
+	 */
+
+>>>>>>> a7cac5bb2103ce03e5aa232b8dcc091406521da7:DiePaten.java
 	private boolean BFS(int source) {
 		boolean augmentedPathExits = false;
 		
@@ -223,6 +459,22 @@ public class DiePaten extends FVSPlayer {
 		}
 		
 		return augmentedPathExits;
+	}
+	
+	//Tiefensuche
+	private boolean TFS(int source){
+		boolean v = false;
+		
+		for (int i = 0; i < size; i++){
+			color[i] = WHITE;
+			minCapacity[i] = Integer.MAX_VALUE;
+		}
+		
+		first = last = 0;
+		queue[last++] = source;
+		color[source] = GRAY;
+		
+		return v;
 	}
 
 	// Do not edit!
